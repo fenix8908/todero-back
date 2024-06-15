@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Date;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -47,17 +48,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } else {
             logger.warn("El token JWT no comienza con Bearer");
         }
+        if (jwtToken != null && username != null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            if (debeRefrescarToken(jwtToken)) {
+                String refreshToken = request.getHeader("RefreshToken");
+                if (refreshToken != null && jwtTokenUtil.validateToken(refreshToken, userDetails)) {
+                    String newAccessToken = jwtTokenUtil.generateToken(userDetails);
+                    response.setHeader("Authorization", "Bearer " + newAccessToken);
+                    // Opcionalmente, actualiza el refresh token también
+                    String newRefreshToken = jwtTokenUtil.resfrescarToken(refreshToken);
+                    response.setHeader("RefreshToken", newRefreshToken);
+                    jwtToken = newAccessToken;  // Actualiza el token que se usa para la autenticación
+                } else {
+                    generarRespuesta(response, "El refresh token no es válido o ha expirado");
+                    return;
+                }
+            }
+            validarAutenticacion(request, username, jwtToken,userDetails);
+        }
 
-        validarAutenticacion(request, username, jwtToken);
         filterChain.doFilter(request, response);
     }
 
-    private void validarAutenticacion(HttpServletRequest request, String username, String jwtToken) {
+    private void validarAutenticacion(HttpServletRequest request, String username, String jwtToken,UserDetails userDetails) {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                        new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -71,6 +89,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.getWriter().write("{\"error\": \"" + mensaje + "\"}");
         logger.warn(mensaje);
+    }
+
+
+    private boolean debeRefrescarToken(String token) {
+        // Refrescar si faltan menos de 5 minutos para expirar
+        Date expirationDate = jwtTokenUtil.getExpirationDateFromToken(token);
+        return expirationDate.before(new Date(System.currentTimeMillis() + 5 * 60 * 1000));
     }
 
 }

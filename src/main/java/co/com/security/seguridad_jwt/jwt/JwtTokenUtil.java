@@ -68,4 +68,12 @@ public class JwtTokenUtil {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
+
+    public String resfrescarToken(String token){
+        if(isTokenExpired(token)){
+            throw new IllegalArgumentException("El token ha éxpirado");
+        }
+        Claims claims =  getAllClaimsFromToken(token);
+        return doGenerateToken(claims,claims.getSubject());
+    }
 }

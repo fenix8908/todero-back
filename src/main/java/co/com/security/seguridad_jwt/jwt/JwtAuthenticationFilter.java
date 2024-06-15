@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        //Se captura el jwt en cda peticion
+        //Se captura el jwt en cda peticionz
         final String requestTokenHeader = request.getHeader("Authorization");
         String username = null;
         String jwtToken = null;
@@ -38,14 +38,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
-                System.out.println("No se pudo obtener el token JWT");
+                generarRespuesta(response,"No se pudo obtener el token JWT");
+                return;
             } catch (ExpiredJwtException e) {
-                System.out.println("El Token JWT ha expirado");
+                generarRespuesta(response,"La sesión actual éxpiro intente iniciar sesión nuevamente");
+                return;
             }
         } else {
             logger.warn("El token JWT no comienza con Bearer");
         }
 
+        validarAutenticacion(request, username, jwtToken);
+        filterChain.doFilter(request, response);
+    }
+
+    private void validarAutenticacion(HttpServletRequest request, String username, String jwtToken) {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
@@ -57,7 +64,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }
-        filterChain.doFilter(request, response);
+    }
+
+    private void generarRespuesta(HttpServletResponse response,String mensaje) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\": \"" + mensaje + "\"}");
+        logger.warn(mensaje);
     }
 
 }

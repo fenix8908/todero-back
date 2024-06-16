@@ -25,18 +25,36 @@ public class JwtTokenUtil {
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    public String generateToken(UserDetails userDetails) {
+    @Value("${jwt.expiration.refresh}")
+    private Long expirationRefresh;
+
+    public String generateToken(UserDetails userDetails, String tipoToken) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        if (tipoToken.equals("access")) {
+            return doGenerateToken(claims, userDetails.getUsername());
+        } else {
+            return doGenerateTokenRefresh(claims, userDetails.getUsername());
+        }
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
+    public String doGenerateToken(Map<String, Object> claims, String subject) {
         Key key = Keys.hmacShaKeyFor(secret.getBytes());
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    public String doGenerateTokenRefresh(Map<String, Object> claims, String subject) {
+        Key key = Keys.hmacShaKeyFor(secret.getBytes());
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationRefresh * 1000))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -69,11 +87,11 @@ public class JwtTokenUtil {
         return expiration.before(new Date());
     }
 
-    public String resfrescarToken(String token){
-        if(isTokenExpired(token)){
+    public String resfrescarToken(String token) {
+        if (isTokenExpired(token)) {
             throw new IllegalArgumentException("El token ha éxpirado");
         }
-        Claims claims =  getAllClaimsFromToken(token);
-        return doGenerateToken(claims,claims.getSubject());
+        Claims claims = getAllClaimsFromToken(token);
+        return doGenerateTokenRefresh(claims, claims.getSubject());
     }
 }

@@ -53,12 +53,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (debeRefrescarToken(jwtToken)) {
                 String refreshToken = request.getHeader("RefreshToken");
                 if (refreshToken != null && jwtTokenUtil.validateToken(refreshToken, userDetails)) {
-                    String newAccessToken = jwtTokenUtil.generateToken(userDetails);
-                    response.setHeader("Authorization", "Bearer " + newAccessToken);
+                    String newAccessToken = jwtTokenUtil.generateToken(userDetails,"access");
                     // Opcionalmente, actualiza el refresh token también
                     String newRefreshToken = jwtTokenUtil.resfrescarToken(refreshToken);
-                    response.setHeader("RefreshToken", newRefreshToken);
                     jwtToken = newAccessToken;  // Actualiza el token que se usa para la autenticación
+                    // Devolver tokens en el cuerpo de la respuesta
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"newAccessToken\": \"" + newAccessToken + "\", \"newRefreshToken\": \"" + newRefreshToken + "\"}");
+                    return;
                 } else {
                     generarRespuesta(response, "El refresh token no es válido o ha expirado");
                     return;

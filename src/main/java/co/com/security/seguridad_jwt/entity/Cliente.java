@@ -23,7 +23,6 @@ public class Cliente implements Serializable {
     private String nombre;
     private String apellido;
     private String email;
-    private String contraseña;
     private String telefono;
     private String direccion;
     private Date fechaRegistro;

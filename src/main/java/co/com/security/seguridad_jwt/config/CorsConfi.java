@@ -13,7 +13,7 @@ public class CorsConfi implements WebMvcConfigurer{
         registry.addMapping("/**")  // para todos los end points
                 .allowedOrigins("http://localhost:4200")  //para los request de este origen
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // para estos metodos
-                .allowedHeaders("*")  //Permitir todos los encabezados (cuidado en producción)
+                .allowedHeaders("Authorization", "Content-Type", "Accept", "Application-JSON","RefreshToken")  //Permitir todos los encabezados (cuidado en producción)
                 .exposedHeaders("newAccessToken", "newRefreshToken")  // Exponer estos headers
                 .allowCredentials(false);  //Establezca en verdadero si permite credenciales (cookies, etc.)
     }

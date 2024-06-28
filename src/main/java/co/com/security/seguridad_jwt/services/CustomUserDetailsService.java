@@ -27,6 +27,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("Usuario no encontrado");
         }
+
+        /* Convertir permisos a authorities
+        Set<GrantedAuthority> authorities = user.getRoles().stream()
+                .flatMap(role -> role.getPermisos().stream()) // Obtener todos los permisos de los roles
+                .map(permiso -> new SimpleGrantedAuthority(permiso.getNombre())) // Convertir permisos a GrantedAuthority
+                .collect(Collectors.toSet());*/
         Set<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(rol -> new SimpleGrantedAuthority(rol.getNombre()))
                 .collect(Collectors.toSet());

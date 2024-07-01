@@ -45,7 +45,9 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Deshabilitar CSRF
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/authenticate","/h2-console/**").permitAll() // Permitir acceso a "/authenticate"
+                        .requestMatchers("/login").permitAll() // Permitir acceso a "/authenticate"
+                        .requestMatchers("/listado").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/saludo").hasAnyAuthority("ROLE_ADMIN","ROLE_USER")
                         .anyRequest().authenticated() // Cualquier otra solicitud debe estar autenticada
                 )
                 .headers(headers -> headers

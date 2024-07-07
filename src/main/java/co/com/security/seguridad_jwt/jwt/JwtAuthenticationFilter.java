@@ -39,10 +39,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
-                generarRespuesta(response,"No se pudo obtener el token JWT");
+                generarRespuesta(response, "No se pudo obtener el token JWT");
                 return;
             } catch (ExpiredJwtException e) {
-                generarRespuesta(response,"La sesión actual éxpiro intente iniciar sesión nuevamente");
+                generarRespuesta(response, "La sesión actual éxpiro intente iniciar sesión nuevamente");
                 return;
             }
         } else {
@@ -53,30 +53,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (debeRefrescarToken(jwtToken)) {
                 String refreshToken = request.getHeader("RefreshToken");
                 if (refreshToken != null && jwtTokenUtil.validateToken(refreshToken, userDetails)) {
-                    String newAccessToken = jwtTokenUtil.generateToken(userDetails,"access");
+                    String newAccessToken = jwtTokenUtil.generateToken(userDetails, "access");
                     String newRefreshToken = jwtTokenUtil.resfrescarToken(refreshToken);
                     jwtToken = newAccessToken;  // Actualiza el token que se usa para la autenticación
                     // Devolver los tokens en cabeceras para ser tomadas por el front
-                    response.addHeader("newAccessToken",jwtToken);
-                    response.addHeader("newRefreshToken",newRefreshToken);
+                    response.addHeader("newAccessToken", jwtToken);
+                    response.addHeader("newRefreshToken", newRefreshToken);
                 } else {
                     generarRespuesta(response, "El refresh token no es válido o ha expirado");
                     return;
                 }
             }
-            validarAutenticacion(request, username, jwtToken,userDetails);
+            validarAutenticacion(request, username, jwtToken, userDetails);
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private void validarAutenticacion(HttpServletRequest request, String username, String jwtToken,UserDetails userDetails) {
+    private void validarAutenticacion(HttpServletRequest request, String username, String jwtToken, UserDetails userDetails) {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+                                userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
@@ -84,7 +84,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void generarRespuesta(HttpServletResponse response,String mensaje) throws IOException {
+    private void generarRespuesta(HttpServletResponse response, String mensaje) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.getWriter().write("{\"error\": \"" + mensaje + "\"}");

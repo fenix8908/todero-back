@@ -9,7 +9,7 @@ public class SaludoController {
 
     @GetMapping("/saludo")
     public ResponseEntity<String> saludar(){
-        return ResponseEntity.ok("Hola gente, probando el webhook");
+        return ResponseEntity.ok("Hola gente !!!");
     }
 }
 

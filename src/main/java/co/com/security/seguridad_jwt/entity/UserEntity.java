@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "usuarios")
 @Getter
 @Setter
 public class UserEntity {

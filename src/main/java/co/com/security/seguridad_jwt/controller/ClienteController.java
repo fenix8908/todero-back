@@ -4,6 +4,7 @@ import co.com.security.seguridad_jwt.entity.Cliente;
 import co.com.security.seguridad_jwt.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +23,15 @@ public class ClienteController {
 
 
     @GetMapping("/listado")
-    public ResponseEntity<List<Cliente>> consultarClientes(){
-        List<Cliente> clientes =  clienteService.obtenerClientes();
-        return ResponseEntity.ok(clientes);
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<List<Cliente>> consultarClientes() {
+        try {
+            List<Cliente> clientes = clienteService.obtenerClientes();
+            return ResponseEntity.ok(clientes);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+
     }
 }

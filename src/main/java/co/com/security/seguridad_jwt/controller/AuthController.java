@@ -42,10 +42,7 @@ public class AuthController {
             final UserDetails userDetails = customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
             final String token = jwtTokenUtil.generateToken(userDetails, "access");
             final String tokenRefresh = jwtTokenUtil.generateToken(userDetails, "refresh");
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .toList();
-            return ResponseEntity.ok(new JwtResponse(token, tokenRefresh, roles));
+            return ResponseEntity.ok(new JwtResponse(token, tokenRefresh));
         } catch (Exception ex) {
             if (ex.getMessage().equals("INVALID_CREDENTIALS")) {
                 return ResponseEntity.status(Integer.parseInt("401")).body("Credenciales incorrectas");

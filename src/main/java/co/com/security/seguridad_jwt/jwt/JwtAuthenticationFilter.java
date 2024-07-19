@@ -46,8 +46,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
         } else {
-            logger.warn("El token JWT no comienza con Bearer");
+            if(!request.getRequestURI().contains("/login")){
+                logger.warn("El token JWT no comienza con Bearer");
+                logger.warn("Verifique la existencia del token");
+                generarRespuesta(response, "Intente iniciar sesión nuevamente");
+                return;
+            }
         }
+        if (validarJwtYusuario(request, response, jwtToken, username)) return;
+
+        filterChain.doFilter(request, response);
+    }
+
+    public boolean validarJwtYusuario(HttpServletRequest request, HttpServletResponse response, String jwtToken, String username) throws IOException {
         if (jwtToken != null && username != null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             if (debeRefrescarToken(jwtToken)) {
@@ -61,13 +72,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     response.addHeader("newRefreshToken", newRefreshToken);
                 } else {
                     generarRespuesta(response, "El refresh token no es válido o ha expirado");
-                    return;
+                    return true;
                 }
             }
             validarAutenticacion(request, username, jwtToken, userDetails);
         }
-
-        filterChain.doFilter(request, response);
+        return false;
     }
 
     private void validarAutenticacion(HttpServletRequest request, String username, String jwtToken, UserDetails userDetails) {

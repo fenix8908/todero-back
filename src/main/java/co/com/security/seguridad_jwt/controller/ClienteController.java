@@ -1,15 +1,13 @@
 package co.com.security.seguridad_jwt.controller;
 
+import co.com.security.seguridad_jwt.dto.ClienteRequest;
 import co.com.security.seguridad_jwt.entity.Cliente;
 import co.com.security.seguridad_jwt.services.ClienteService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,7 +21,6 @@ public class ClienteController {
 
 
     @GetMapping("/listado")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Secured({"ROLE_ADMIN"})
     public ResponseEntity<List<Cliente>> consultarClientes() {
         try {
@@ -32,6 +29,16 @@ public class ClienteController {
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage());
         }
+    }
 
+    @PostMapping(value = "/crear",produces = "application/json")
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<?> clearCliente(@Valid @RequestBody ClienteRequest clienteRequest) {
+        try {
+            Cliente cliente = clienteService.crearcliente(clienteRequest);
+            return ResponseEntity.ok(cliente);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
     }
 }

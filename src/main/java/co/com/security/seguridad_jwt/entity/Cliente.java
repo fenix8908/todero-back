@@ -1,10 +1,7 @@
 package co.com.security.seguridad_jwt.entity;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,7 +11,9 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
+@Builder
 public class Cliente implements Serializable {
 
     @Id

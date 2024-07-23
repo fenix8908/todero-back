@@ -32,7 +32,7 @@ public class ClienteController {
     }
 
     @PostMapping(value = "/crear",produces = "application/json")
-    @Secured({"ROLE_ADMIN"})
+    @Secured({"ROLE_ADMIN","ROLE_USER"})
     public ResponseEntity<?> clearCliente(@Valid @RequestBody ClienteRequest clienteRequest) {
         try {
             Cliente cliente = clienteService.crearcliente(clienteRequest);

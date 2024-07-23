@@ -10,13 +10,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class JwtResponse {
-
-    public JwtResponse(String tokenResponse, String refreshToken) {
-        this.tokenResponse = tokenResponse;
-        this.refreshToken = refreshToken;
-    }
-
     private String tokenResponse;
     private String refreshToken;
-    private List<String> roles;
 }

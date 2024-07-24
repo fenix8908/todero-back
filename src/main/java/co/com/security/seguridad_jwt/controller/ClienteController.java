@@ -4,6 +4,8 @@ import co.com.security.seguridad_jwt.dto.ClienteRequest;
 import co.com.security.seguridad_jwt.entity.Cliente;
 import co.com.security.seguridad_jwt.services.ClienteService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequestMapping("/clientes")
 public class ClienteController {
 
+    private Logger log = LoggerFactory.getLogger(ClienteController.class);
     @Autowired
     private ClienteService clienteService;
 
@@ -38,7 +41,8 @@ public class ClienteController {
             Cliente cliente = clienteService.crearcliente(clienteRequest);
             return ResponseEntity.ok(cliente);
         } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage());
+            log.error(ex.toString());
+            return ResponseEntity.badRequest().body("No fue posible crear el cliente");
         }
     }
 }

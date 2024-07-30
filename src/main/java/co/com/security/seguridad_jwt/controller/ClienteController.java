@@ -23,8 +23,8 @@ public class ClienteController {
     private ClienteService clienteService;
 
 
-    @GetMapping("/listado")
     @Secured({"ROLE_ADMIN"})
+    @GetMapping("/listado")
     public ResponseEntity<List<Cliente>> consultarClientes() {
         try {
             List<Cliente> clientes = clienteService.obtenerClientes();
@@ -34,8 +34,9 @@ public class ClienteController {
         }
     }
 
-    @PostMapping(value = "/crear",produces = "application/json")
-    @Secured({"ROLE_ADMIN","ROLE_USER"})
+
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @PostMapping(value = "/crear", produces = "application/json")
     public ResponseEntity<?> clearCliente(@Valid @RequestBody ClienteRequest clienteRequest) {
         try {
             Cliente cliente = clienteService.crearcliente(clienteRequest);
@@ -43,6 +44,19 @@ public class ClienteController {
         } catch (Exception ex) {
             log.error(ex.toString());
             return ResponseEntity.badRequest().body("No fue posible crear el cliente");
+        }
+    }
+
+
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @PutMapping(value = "/editar/{id}", produces = "application/json")
+    public ResponseEntity<?> editarCliente(@Valid @RequestBody ClienteRequest clienteRequest, @PathVariable("id") long id) {
+        try {
+            Cliente cliente = clienteService.editarCliente(clienteRequest, id);
+            return ResponseEntity.ok(cliente);
+        } catch (Exception ex) {
+            log.error(ex.toString());
+            return ResponseEntity.badRequest().body("No fue posible editar el cliente");
         }
     }
 }

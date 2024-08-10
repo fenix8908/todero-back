@@ -25,6 +25,15 @@ public class ClienteService {
         return clienteRepository.findAll();
     }
 
+    public Cliente buscarClientePorId(Long id) {
+        Optional<Cliente> clienteObtenido = clienteRepository.findById(id);
+        if (clienteObtenido.isPresent()) {
+            return clienteObtenido.get();
+        } else {
+            throw new NoSuchElementException("El cliente indicado no existe");
+        }
+    }
+
     @Transactional
     public Cliente crearcliente(ClienteRequest clienteRequest) {
         Cliente cliente = Cliente.builder().build();

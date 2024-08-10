@@ -13,6 +13,7 @@ services:
       - app-network
 
   app:
+    container_name: toderoAppContainer
     build: .
     depends_on:
       - postgres
@@ -26,6 +27,7 @@ services:
       - app-network
 
   frontend:
+    container_name: toderoAppFront
     build:
       context: ../detoderoapp
       dockerfile: Dockerfile

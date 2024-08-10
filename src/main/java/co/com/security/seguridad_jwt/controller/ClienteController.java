@@ -12,6 +12,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @CrossOrigin
@@ -30,9 +31,26 @@ public class ClienteController {
             List<Cliente> clientes = clienteService.obtenerClientes();
             return ResponseEntity.ok(clientes);
         } catch (Exception ex) {
+            log.error(ex.toString());
             throw new RuntimeException(ex.getMessage());
         }
     }
+
+    @Secured({"ROLE_ADMIN","ROLE_USER"})
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity<?> obtenerClientePorId(@PathVariable("id") long id) {
+        try {
+            Cliente cliente = clienteService.buscarClientePorId(id);
+            return ResponseEntity.ok(cliente);
+        } catch (Exception ex) {
+            log.error(ex.toString());
+            if(ex.getMessage().equals("El cliente indicado no existe")){
+                return ResponseEntity.status(404).body(ex.getMessage());
+            }
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
 
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})

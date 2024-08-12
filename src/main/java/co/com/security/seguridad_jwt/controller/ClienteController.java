@@ -74,7 +74,7 @@ public class ClienteController {
             return ResponseEntity.ok(cliente);
         } catch (Exception ex) {
             log.error(ex.toString());
-            return ResponseEntity.badRequest().body("No fue posible editar el cliente");
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 }

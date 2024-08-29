@@ -7,7 +7,7 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
+/*@Component
 @EnableRabbit
 public class ApiSeguridadPublisher {
 
@@ -23,3 +23,4 @@ public class ApiSeguridadPublisher {
     }
 
 }
+*/

@@ -4,7 +4,6 @@ import co.com.security.seguridad_jwt.entity.UserEntity;
 import co.com.security.seguridad_jwt.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,8 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Usuario no encontrado");
         }
 
-        /* Convertir permisos a authorities
-        Set<GrantedAuthority> authorities = user.getRoles().stream()
+        /*Set<GrantedAuthority> authorities = user.getRoles().stream()
                 .flatMap(role -> role.getPermisos().stream()) // Obtener todos los permisos de los roles
                 .map(permiso -> new SimpleGrantedAuthority(permiso.getNombre())) // Convertir permisos a GrantedAuthority
                 .collect(Collectors.toSet());*/

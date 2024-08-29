@@ -1,15 +1,21 @@
 package co.com.security.seguridad_jwt.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.io.Serial;
+import java.io.Serializable;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class JwtResponse {
+@Builder
+public class JwtResponse  implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
     private String tokenResponse;
     private String refreshToken;
 }

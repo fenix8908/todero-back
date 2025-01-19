@@ -1,6 +1,7 @@
 package co.com.toderoback.app.controller;
 
 import co.com.toderoback.app.dto.ClienteRequest;
+import co.com.toderoback.app.dto.RespuestaGenerica;
 import co.com.toderoback.app.entity.Cliente;
 import co.com.toderoback.app.services.ClienteService;
 import jakarta.validation.Valid;
@@ -56,7 +57,10 @@ public class ClienteController {
     @PostMapping(value = "/crear", produces = "application/json")
     public ResponseEntity<?> clearCliente(@Valid @RequestBody ClienteRequest clienteRequest) {
         try {
-            Cliente cliente = clienteService.crearcliente(clienteRequest);
+            RespuestaGenerica<Object> cliente = clienteService.crearcliente(clienteRequest);
+            if(!cliente.isSuccess()){
+                return ResponseEntity.badRequest().body(cliente);
+            }
             return ResponseEntity.ok(cliente);
         } catch (Exception ex) {
             log.error(ex.toString());

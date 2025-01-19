@@ -1,5 +1,6 @@
 package co.com.toderoback.app.services;
 
+import co.com.toderoback.app.dto.RespuestaGenerica;
 import co.com.toderoback.app.repository.ClienteRepository;
 import co.com.toderoback.app.dto.ClienteRequest;
 import co.com.toderoback.app.entity.Cliente;
@@ -31,7 +32,14 @@ public class ClienteService {
     }
 
     @Transactional
-    public Cliente crearcliente(ClienteRequest clienteRequest) {
+    public RespuestaGenerica<Object> crearcliente(ClienteRequest clienteRequest) {
+        Cliente clientePorNombre = buscarClientePorNombre(clienteRequest.getNombre(),clienteRequest.getApellido());
+        if(clientePorNombre != null){
+            return RespuestaGenerica.builder()
+                    .success(false)
+                    .mensaje("El nombre ingresado ya existe")
+                    .codigoError(null).build();
+        }
         Cliente cliente = Cliente.builder().build();
         cliente.setNombre(clienteRequest.getNombre());
         cliente.setApellido(clienteRequest.getApellido());
@@ -39,8 +47,13 @@ public class ClienteService {
         cliente.setEmail(clienteRequest.getEmail());
         cliente.setDireccion(clienteRequest.getDireccion());
         cliente.setFechaRegistro(clienteRequest.getFechaRegistro());
-        return clienteRepository.save(cliente);
-        //return  cliente;
+        Cliente clienteGuardado =  clienteRepository.save(cliente);
+        return RespuestaGenerica.builder()
+                .success(true)
+                .data(clienteGuardado)
+                .mensaje("Cliendo creado con exito")
+                .codigoError(null).build();
+
     }
 
     @Transactional
@@ -60,6 +73,13 @@ public class ClienteService {
             throw new NoSuchElementException("El cliente no se encuentra registrado");
         }
     }
+
+
+    public Cliente buscarClientePorNombre(String nombre,String apellido){
+        Optional<Cliente> cliente = clienteRepository.findByNombreAndApellido(nombre,apellido);
+        return cliente.orElse(null);
+    }
+
 
 
 }
